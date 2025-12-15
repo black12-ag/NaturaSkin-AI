@@ -1,6 +1,6 @@
 {
   "name": "naturaskin-ai-web",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "NaturaSkin AI - Natural Skin Texture Enhancement Web Tool",
   "scripts": {
     "dev": "vite",
