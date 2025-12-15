@@ -20,9 +20,9 @@
 
 ```mermaid
 graph LR
-    User([User]) -->|1. Upload Portrait| Web[Web Client <br/> (Vite/JS)]
-    Web -->|2. Pre-process| API{API Gateway <br/> Cloudflare Functions}
-    API -->|3. Inference Req| Flux[Flux.1 AI Model <br/> (ComfyUI Backend)]
+    User([User]) -->|1. Upload Portrait| Web["Web Client <br/> (Vite/JS)"]
+    Web -->|2. Pre-process| API{"API Gateway <br/> Cloudflare Functions"}
+    API -->|3. Inference Req| Flux["Flux.1 AI Model <br/> (ComfyUI Backend)"]
     Flux -->|4. Texture Map| Refine[Enhancement Node]
     Refine -->|5. Image Result| API
     API -->|6. JSON Response| Web
