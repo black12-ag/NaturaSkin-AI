@@ -7,7 +7,7 @@
 
   [![Sponsor](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/black12-ag)
   [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-  [![Cloudflare Pages](https://img.shields.io/badge/deploy-Cloudflare%20Pages-orange)](https://pages.cloudflare.com/)
+  [![Developer](https://img.shields.io/badge/Developer-Munir%20Kabir-teal)](https://github.com/black12-ag)
 </div>
 
 ---
@@ -16,38 +16,48 @@
 
 ## 🧠 System Architecture
 
-### Project Structure (Mermaid)
+### 1. High-Level Data Flow
 
 ```mermaid
-graph TD
-    A[User Browser] -->|Upload image| B(NaturaSkin Web App)
-    B -->|Preprocessing| C{Parameter Check}
-    C -->|Denoise & CFG| D[Flux AI Core]
-    D -->|Texture Injection| E[Film Grain Node]
-    E -->|Enhancement| F[Final Output]
-    F -->|Download| A
-    
-    style B fill:#2dd4bf,stroke:#0f766e,color:white
-    style D fill:#f43f5e,stroke:#9f1239,color:white
+graph LR
+    User([User]) -->|1. Upload Portrait| Web[Web Client <br/> (Vite/JS)]
+    Web -->|2. Pre-process| API{API Gateway <br/> Cloudflare Functions}
+    API -->|3. Inference Req| Flux[Flux.1 AI Model <br/> (ComfyUI Backend)]
+    Flux -->|4. Texture Map| Refine[Enhancement Node]
+    Refine -->|5. Image Result| API
+    API -->|6. JSON Response| Web
+    Web -->|7. Display/Download| User
+
+    style Web fill:#2dd4bf,stroke:#0f766e,color:black
+    style Flux fill:#f43f5e,stroke:#9f1239,color:white
 ```
 
-### How the Web App Works
+### 2. Detailed Technical Workflow
 
 ```mermaid
 sequenceDiagram
-    participant U as User
-    participant W as Web Interface
-    participant E as Enhancement Engine
+    participant C as Client (Browser)
+    participant S as Server (Worker)
+    participant AI as AI Engine (Flux)
     
-    U->>W: Uploads Portrait
-    W->>W: Generates Preview
-    U->>W: Adjusts Texture Strength (20-50%)
-    U->>W: Clicks "Apply Natural Texture"
-    W->>E: Sends Image Data + Params
-    E->>E: Segment Skin Areas
-    E->>E: Inject Flux Texture
-    E-->>W: Returns Enhanced Image
-    W->>U: Displays Result (Download Available)
+    C->>C: Validate Image (Size/Type)
+    C->>C: Generate Preview Blob
+    C->>S: POST /api/enhance {image, denoise: 0.35}
+    
+    Note over S, AI: Secure Handshake
+    
+    S->>AI: Queue Prompt (Skin_Fix_Workflow_v1)
+    AI->>AI: Load Checkpoint (enhancor.safetensors)
+    AI->>AI: Segment Face (Mask)
+    AI->>AI: Apply Localized Noise Injection
+    AI->>AI: KSampler (20 Steps, 0.35 Denoise)
+    AI->>AI: VAE Decode
+    
+    AI-->>S: Return Base64 Image
+    S-->>C: Response {success: true, url: "..."}
+    
+    C->>C: Update UI State
+    C->>C: Enable Download Button
 ```
 
 ## 🚀 Live Demo
@@ -76,7 +86,9 @@ npm run dev
 
 ## 🔒 Copyright & License
 
-User Code and Design Copyright © 2025 **black12-ag**.
-Code released under the [MIT License](LICENSE).
+**Copyright © 2025 Munir Kabir**.
+Licensed under the [MIT License](LICENSE).
 
-This project is open source and available for personal and commercial use.
+**Repository**: [https://github.com/black12-ag/NaturaSkin-AI.git](https://github.com/black12-ag/NaturaSkin-AI.git)
+
+This availability of this open source code is made possible by **Munir Kabir** and is free for personal and commercial use.
