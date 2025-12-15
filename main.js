@@ -176,35 +176,40 @@ async function enhanceImage() {
 }
 
 async function processImageWithAI(imageData, denoise, cfg) {
-    // === NATURASKIN AI ENGINE CHECK ===
     console.log("NaturaSkin Deep Check: Validating parameters...");
     console.log(`- Denoise Strength: ${denoise} (Optimal: 0.35)`);
-    console.log(`- Texture Detail: High`);
 
-    // Simulate AI pipeline delay (Flux Model Processing)
+    // Check if we are in production with an API endpoint
+    // In a real deployment, this would point to a Cloudflare Worker or Next.js API route
+    const API_ENDPOINT = '/api/enhance';
+
+    try {
+        // Attempt to call the backend if it exists
+        // Note: This will 404 on the static site demo until you add a Cloudflare Function
+        const response = await fetch(API_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: imageData, denoise: denoise / 100 })
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            return { success: true, imageUrl: result.output };
+        }
+    } catch (e) {
+        // Fallback to Simulation Mode if backend is not connected
+        console.warn("Backend not connected, running simulation:", e);
+    }
+
+    // SIMULATION MODE (Default for Static Demo)
     await new Promise(resolve => setTimeout(resolve, 2500));
 
-    // In this web demo, we return the original image to show the UI flow.
-    // To enable REAL skin transformation, you must deploy the ComfyUI backend.
     return {
         success: true,
         imageUrl: imageData,
         message: 'NaturaSkin Demo: Connect Backend for Real Flux Processing'
     };
 }
-
-/* PRODUCTION CODE (uncomment when backend is ready):
-    try {
-        const response = await fetch('/api/enhance', {
-            method: 'POST',
-            body: JSON.stringify({ image: imageData, denoise })
-        });
-        return await response.json();
-    } catch (error) {
-        return { success: false, error: error.message };
-    }
-    */
-
 function downloadImage() {
     if (!enhancedImageUrl) {
         showNotification('No enhanced image to download', 'error');
