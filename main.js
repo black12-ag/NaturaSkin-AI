@@ -1,6 +1,7 @@
 // ===== STATE MANAGEMENT =====
 let currentImage = null;
 let enhancedImageUrl = null;
+let isDemoMode = false;
 
 // ===== DOM ELEMENTS =====
 const uploadArea = document.getElementById('uploadArea');
@@ -8,6 +9,7 @@ const uploadContent = document.getElementById('uploadContent');
 const previewArea = document.getElementById('previewArea');
 const fileInput = document.getElementById('fileInput');
 const browseBtn = document.getElementById('browseBtn');
+const tryDemoBtn = document.getElementById('tryDemoBtn');
 const originalImage = document.getElementById('originalImage');
 const enhancedImage = document.getElementById('enhancedImage');
 const enhancedPlaceholder = document.getElementById('enhancedPlaceholder');
@@ -15,11 +17,24 @@ const enhanceBtn = document.getElementById('enhanceBtn');
 const downloadBtn = document.getElementById('downloadBtn');
 const resetBtn = document.getElementById('resetBtn');
 const denoiseSlider = document.getElementById('denoiseSlider');
-const cfgSlider = document.getElementById('cfgSlider');
 const denoiseValue = document.getElementById('denoiseValue');
-const cfgValue = document.getElementById('cfgValue');
+
+// Comparison Elements
+const comparisonContainer = document.getElementById('comparisonContainer');
+const sideBySideContainer = document.getElementById('sideBySideContainer');
+const compBefore = document.getElementById('compBefore');
+const compAfter = document.getElementById('compAfter');
+const sliderHandle = document.querySelector('.slider-handle');
 
 // ===== EVENT LISTENERS =====
+
+// Try Demo Button
+tryDemoBtn.addEventListener('click', () => {
+    isDemoMode = true;
+    startDemoMode();
+    // Scroll to tool
+    document.getElementById('demo').scrollIntoView({ behavior: 'smooth' });
+});
 
 // Browse button click
 browseBtn.addEventListener('click', (e) => {
@@ -48,6 +63,7 @@ uploadArea.addEventListener('dragleave', () => {
 uploadArea.addEventListener('drop', (e) => {
     e.preventDefault();
     uploadContent.classList.remove('drag-over');
+    isDemoMode = false;
 
     const files = e.dataTransfer.files;
     if (files.length > 0) {
@@ -57,11 +73,7 @@ uploadArea.addEventListener('drop', (e) => {
 
 // Slider updates
 denoiseSlider.addEventListener('input', (e) => {
-    denoiseValue.textContent = e.target.value;
-});
-
-cfgSlider.addEventListener('input', (e) => {
-    cfgValue.textContent = e.target.value;
+    denoiseValue.textContent = e.target.value + '%';
 });
 
 // Button actions
@@ -69,9 +81,39 @@ enhanceBtn.addEventListener('click', enhanceImage);
 downloadBtn.addEventListener('click', downloadImage);
 resetBtn.addEventListener('click', resetApp);
 
+// Comparison Slider Logic
+let isDragging = false;
+comparisonContainer.addEventListener('mousedown', () => isDragging = true);
+document.addEventListener('mouseup', () => isDragging = false);
+comparisonContainer.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    updateSlider(e);
+});
+comparisonContainer.addEventListener('click', updateSlider);
+
+function updateSlider(e) {
+    const rect = comparisonContainer.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    let percentage = (x / rect.width) * 100;
+    percentage = Math.max(0, Math.min(100, percentage));
+
+    compBefore.style.width = percentage + '%';
+    sliderHandle.style.left = percentage + '%';
+}
+
+
 // ===== FUNCTIONS =====
 
+function startDemoMode() {
+    isDemoMode = true;
+    const demoSrc = '/assets/demo_before.png';
+    currentImage = demoSrc;
+    displayImage(demoSrc);
+    showNotification('Demo loaded! Click "Enhance" to see the magic ✨', 'success');
+}
+
 function handleFileSelect(e) {
+    isDemoMode = false;
     const file = e.target.files[0];
     if (file) {
         handleFile(file);
@@ -79,19 +121,15 @@ function handleFileSelect(e) {
 }
 
 function handleFile(file) {
-    // Validate file type
     if (!file.type.startsWith('image/')) {
         showNotification('Please select an image file', 'error');
         return;
     }
-
-    // Validate file size (10MB max)
     if (file.size > 10 * 1024 * 1024) {
         showNotification('Image size must be less than 10MB', 'error');
         return;
     }
 
-    // Read and display image
     const reader = new FileReader();
     reader.onload = (e) => {
         currentImage = e.target.result;
@@ -101,16 +139,18 @@ function handleFile(file) {
 }
 
 function displayImage(imageData) {
-    // Hide upload content, show preview
     uploadContent.classList.add('hidden');
     previewArea.classList.remove('hidden');
 
-    // Set original image
-    originalImage.src = imageData;
+    // Hide comparison initially
+    comparisonContainer.style.display = 'none';
+    sideBySideContainer.style.display = 'flex';
 
-    // Reset enhanced image
+    originalImage.src = imageData;
     enhancedImage.classList.add('hidden');
     enhancedPlaceholder.classList.remove('hidden');
+
+    // Reset enhanced placeholder text
     enhancedPlaceholder.innerHTML = `
         <div style="font-size: 3rem;">🎨</div>
         <p>Ready to enhance</p>
@@ -119,63 +159,72 @@ function displayImage(imageData) {
 }
 
 async function enhanceImage() {
-    if (!currentImage) {
-        showNotification('Please upload an image first', 'error');
-        return;
-    }
+    if (!currentImage) return;
 
-    // Show processing state
     enhanceBtn.disabled = true;
-    enhanceBtn.innerHTML = `
-        <div class="spinner" style="width: 20px; height: 20px; border-width: 3px;"></div>
-        <span>Processing...</span>
-    `;
+    enhanceBtn.innerHTML = `<span class="spinner"></span> Processing...`;
 
     enhancedPlaceholder.classList.remove('hidden');
     enhancedImage.classList.add('hidden');
     enhancedPlaceholder.innerHTML = `
         <div class="spinner"></div>
         <p>Enhancing skin texture...</p>
-        <p style="font-size: 0.875rem; color: var(--text-muted);">This may take 30-60 seconds</p>
     `;
 
     try {
-        // Get parameters
         const denoise = parseFloat(denoiseSlider.value);
-        const cfg = parseFloat(cfgSlider.value);
 
-        // Call API (we'll implement this with a serverless function)
-        const result = await processImageWithAI(currentImage, denoise, cfg);
+        // Call Processing
+        const result = await processImageWithAI(currentImage, denoise);
 
         if (result.success) {
             enhancedImageUrl = result.imageUrl;
-            enhancedImage.src = enhancedImageUrl;
-            enhancedImage.classList.remove('hidden');
-            enhancedPlaceholder.classList.add('hidden');
+
+            // If in Demo Mode, activate the Slider!
+            if (isDemoMode) {
+                activeComparisonView(currentImage, enhancedImageUrl);
+            } else {
+                // Standard View
+                enhancedImage.src = enhancedImageUrl;
+                enhancedImage.classList.remove('hidden');
+                enhancedPlaceholder.classList.add('hidden');
+            }
+
             downloadBtn.disabled = false;
             showNotification('Enhancement complete! 🎉', 'success');
-        } else {
-            throw new Error(result.error || 'Enhancement failed');
         }
     } catch (error) {
-        console.error('Enhancement error:', error);
-        showNotification('Enhancement failed. Please try again.', 'error');
-        enhancedPlaceholder.innerHTML = `
-            <div style="font-size: 3rem;">❌</div>
-            <p>Enhancement failed</p>
-            <p style="font-size: 0.875rem; color: var(--text-muted);">${error.message}</p>
-        `;
+        console.error(error);
+        showNotification('Enhancement failed.', 'error');
     } finally {
-        // Reset button state
         enhanceBtn.disabled = false;
-        enhanceBtn.innerHTML = `
-            <span class="btn-icon">✨</span>
-            Enhance Skin
-        `;
+        enhanceBtn.innerHTML = `✨ Enhance Skin`;
     }
 }
 
-async function processImageWithAI(imageData, denoise, cfg) {
+function activeComparisonView(beforeSrc, afterSrc) {
+    sideBySideContainer.style.display = 'none';
+    comparisonContainer.style.display = 'block';
+
+    compBefore.src = beforeSrc;
+    compAfter.src = afterSrc;
+
+    // Reset slider to center
+    compBefore.style.width = '50%';
+    sliderHandle.style.left = '50%';
+}
+
+async function processImageWithAI(imageData, denoise) {
+    // If DEMO MODE is active, we return the pre-baked "After" image
+    if (isDemoMode) {
+        await new Promise(resolve => setTimeout(resolve, 1500)); // Fake delay
+        return {
+            success: true,
+            imageUrl: '/assets/demo_after.png' // THE REAL CHANGE
+        };
+    }
+
+    // Otherwise, try backend... (reusing previous logic)
     console.log("NaturaSkin Deep Check: Validating parameters...");
     console.log(`- Denoise Strength: ${denoise} (Optimal: 0.35)`);
 

@@ -55,6 +55,12 @@
                     Remove the "plastic" look. Our specialized Flux-based pipeline injects realistic pores, texture, and
                     natural imperfections into AI portraits.
                 </p>
+                <div class="hero-actions" style="margin-top: 2rem;">
+                    <button class="btn btn-primary" id="tryDemoBtn" style="padding: 1rem 2rem; font-size: 1.1rem;">✨ Try
+                        Live Demo with Pre-loaded Image</button>
+                    <p style="margin-top: 10px; font-size: 0.9rem; color: var(--text-secondary);">or scroll down to
+                        upload your own</p>
+                </div>
             </div>
         </div>
     </section>
@@ -74,7 +80,26 @@
 
                     <!-- Preview -->
                     <div class="preview-area hidden" id="previewArea">
-                        <div class="preview-container">
+                        <!-- Before/After Comparison Container -->
+                        <div class="comparison-container" id="comparisonContainer"
+                            style="position: relative; width: 100%; max-width: 600px; margin: 0 auto 30px; border-radius: 12px; overflow: hidden; cursor: col-resize; display: none;">
+                            <img id="compAfter" src="" style="width: 100%; display: block;">
+                            <img id="compBefore" src=""
+                                style="position: absolute; top: 0; left: 0; height: 100%; width: 50%; object-fit: cover; object-position: left; border-right: 2px solid white;">
+                            <div class="slider-handle"
+                                style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                                ↔️
+                            </div>
+                            <div class="labels"
+                                style="position: absolute; bottom: 20px; left: 20px; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 4px;">
+                                Before</div>
+                            <div class="labels"
+                                style="position: absolute; bottom: 20px; right: 20px; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 4px;">
+                                After</div>
+                        </div>
+
+                        <!-- Standard Side-by-Side (Fallback) -->
+                        <div class="preview-container" id="sideBySideContainer">
                             <div class="preview-box">
                                 <h4>Original</h4>
                                 <img id="originalImage" src="" alt="Original">
