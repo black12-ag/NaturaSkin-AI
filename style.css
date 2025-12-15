@@ -66,6 +66,7 @@ body {
     font-family: var(--font-display);
     background: var(--gradient-primary);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     margin: 0;
 }
@@ -106,6 +107,7 @@ body {
 .gradient-text {
     background: var(--gradient-primary);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -195,14 +197,22 @@ body {
     margin-bottom: 30px;
 }
 
+.preview-box {
+    flex: 1;
+    max-width: 500px;
+}
+
 .preview-box img {
-    max-width: 100%;
+    width: 100%;
+    height: auto;
     border-radius: 10px;
+    display: block;
 }
 
 .enhanced-placeholder {
-    width: 300px;
-    height: 300px;
+    width: 100%;
+    aspect-ratio: 1;
+    /* Maintain square-ish ratio but flexible */
     background: rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
@@ -217,4 +227,57 @@ body {
     color: var(--text-secondary);
     padding: 40px 0;
     border-top: 1px solid var(--border);
+}
+
+/* ===== MOBILE RESPONSIVENESS ===== */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .nav {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .nav-link {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .enhancement-card {
+        padding: 20px;
+    }
+
+    .preview-container {
+        flex-direction: column;
+    }
+
+    .arrow-divider {
+        transform: rotate(90deg);
+        /* Point down on mobile */
+        margin: 10px 0;
+    }
+
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .btn {
+        width: 100%;
+    }
+
+    .comparison-container {
+        height: 300px;
+        /* Fixed height for mobile slider visibility */
+    }
 }
