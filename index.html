@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NaturaSkin AI - Natural Skin Texture Enhancement</title>
+    <meta name="description"
+        content="Restore authentic, natural skin texture to AI-generated images. Pure, realistic, and free.">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">🌿</div>
+                    <h1 class="logo-text">NaturaSkin AI</h1>
+                </div>
+                <nav class="nav">
+                    <a href="#demo" class="nav-link">Live Demo</a>
+                    <a href="#technology" class="nav-link">Technology</a>
+                    <a href="#about" class="nav-link">About</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="badge-icon">✨</span>
+                    <span>100% Free Open Source Tool</span>
+                </div>
+                <h2 class="hero-title">
+                    Bring <span class="gradient-text">Real Life</span><br>
+                    Back to AI Skin
+                </h2>
+                <p class="hero-description">
+                    Remove the "plastic" look. Our specialized Flux-based pipeline injects realistic pores, texture, and
+                    natural imperfections into AI portraits.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Tool -->
+    <section class="enhancement-section" id="demo">
+        <div class="container">
+            <div class="enhancement-card">
+                <div class="upload-area" id="uploadArea">
+                    <input type="file" id="fileInput" accept="image/*" hidden>
+                    <div class="upload-content" id="uploadContent">
+                        <div class="upload-icon">🍃</div>
+                        <h3 class="upload-title">Upload Portrait</h3>
+                        <p class="upload-description">Drag & drop or click to browse</p>
+                        <button class="btn btn-primary" id="browseBtn">Select Image</button>
+                    </div>
+
+                    <!-- Preview -->
+                    <div class="preview-area hidden" id="previewArea">
+                        <div class="preview-container">
+                            <div class="preview-box">
+                                <h4>Original</h4>
+                                <img id="originalImage" src="" alt="Original">
+                            </div>
+                            <div class="arrow-divider">→</div>
+                            <div class="preview-box">
+                                <h4>NaturaSkin Result</h4>
+                                <div class="enhanced-placeholder" id="enhancedPlaceholder">
+                                    <div class="spinner"></div>
+                                    <p>Analyzing Skin Texture...</p>
+                                </div>
+                                <img id="enhancedImage" src="" alt="Enhanced" class="hidden">
+                            </div>
+                        </div>
+
+                        <div class="controls">
+                            <div class="control-group">
+                                <label>Texture Intensity: <span id="denoiseValue">35%</span></label>
+                                <input type="range" id="denoiseSlider" min="20" max="50" value="35">
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" id="enhanceBtn">Apply Natural Texture</button>
+                            <button class="btn btn-secondary" id="downloadBtn" disabled>Download</button>
+                            <button class="btn btn-ghost" id="resetBtn">Reset</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Deep Check / Technology -->
+    <section class="features" id="technology">
+        <div class="container">
+            <h2 class="section-title">The "Deep Check" Pipeline</h2>
+            <div class="tech-grid">
+                <div class="tech-card">
+                    <h3>1. Segmentation</h3>
+                    <p>Identifies skin regions automatically.</p>
+                </div>
+                <div class="tech-card">
+                    <h3>2. Flux Sampling</h3>
+                    <p>Re-samples texture using the Flux.1 model.</p>
+                </div>
+                <div class="tech-card">
+                    <h3>3. Detail Injection</h3>
+                    <p>Adds micropores and film grain.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 NaturaSkin AI Project. Open Source.</p>
+        </div>
+    </footer>
+
+    <script type="module" src="/main.js"></script>
+</body>
+
+</html>

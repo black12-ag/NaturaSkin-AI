@@ -1,0 +1,29 @@
+{
+    "brand": {
+        "name": "NaturaSkin AI",
+        "slogan": "Authentic Beauty, Naturally",
+        "colors": {
+            "primary": "#2dd4bf",
+            "dark": "#134e4a",
+            "light": "#99f6e4",
+            "accent": "#f43f5e"
+        },
+        "typography": {
+            "primary": "Inter",
+            "display": "Outfit"
+        }
+    },
+    "logo_visual": {
+        "concept": "A stylized water droplet merging with a leaf contour, symbolizing natural purity and skin hydration.",
+        "icon_type": "vector_monoline",
+        "shapes": [
+            "droplet",
+            "leaf",
+            "face_profile"
+        ],
+        "composition": "Icon on left, Text 'NaturaSkin' in bold clean sans-serif on right",
+        "gradients": [
+            "teal-400 to teal-600"
+        ]
+    }
+}

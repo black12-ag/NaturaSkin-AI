@@ -1,0 +1,23 @@
+{
+  "name": "naturaskin-ai-web",
+  "version": "1.0.0",
+  "description": "NaturaSkin AI - Natural Skin Texture Enhancement Web Tool",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "ai",
+    "skin",
+    "texture",
+    "naturaskin",
+    "flux"
+  ],
+  "author": "NaturaSkin Project",
+  "license": "MIT",
+  "type": "module",
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
