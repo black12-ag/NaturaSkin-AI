@@ -8,6 +8,7 @@
   [![Sponsor](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/black12-ag)
   [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
   [![Developer](https://img.shields.io/badge/Developer-Munir%20Kabir-teal)](https://github.com/black12-ag)
+  [![Live Demo](https://img.shields.io/badge/Live%20app-naturaskin--ai.pages.dev-success)](https://naturaskin-ai.pages.dev/)
 </div>
 
 ---

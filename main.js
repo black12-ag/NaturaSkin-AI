@@ -10,8 +10,11 @@ const previewArea = document.getElementById('previewArea');
 const fileInput = document.getElementById('fileInput');
 const browseBtn = document.getElementById('browseBtn');
 const tryDemoBtn = document.getElementById('tryDemoBtn');
+const compareBtn = document.getElementById('compareBtn'); // Added missing reference
 const originalImage = document.getElementById('originalImage');
 const enhancedImage = document.getElementById('enhancedImage');
+
+
 const enhancedPlaceholder = document.getElementById('enhancedPlaceholder');
 const enhanceBtn = document.getElementById('enhanceBtn');
 const downloadBtn = document.getElementById('downloadBtn');
@@ -158,14 +161,35 @@ function displayImage(imageData) {
     downloadBtn.disabled = true;
 }
 
+function showOriginal() {
+    if (!enhancedImage.classList.contains('hidden')) {
+        enhancedImage.src = currentImage; // Temporarily swap src
+        // Remove filter if applied
+        enhancedImage.style.filter = 'none';
+    }
+}
+
+function showEnhanced() {
+    if (!enhancedImage.classList.contains('hidden') && enhancedImageUrl) {
+        enhancedImage.src = enhancedImageUrl;
+        // Re-apply filter if it was a simulated user upload
+        if (!isDemoMode && enhancedImageUrl === currentImage) {
+            enhancedImage.style.filter = 'contrast(1.15) saturate(1.1) sepia(0.15)';
+        }
+    }
+}
+
 async function enhanceImage() {
     if (!currentImage) return;
 
     enhanceBtn.disabled = true;
     enhanceBtn.innerHTML = `<span class="spinner"></span> Processing...`;
+    compareBtn.classList.add('hidden'); // Hide during processing
 
     enhancedPlaceholder.classList.remove('hidden');
     enhancedImage.classList.add('hidden');
+    enhancedImage.style.filter = 'none'; // Reset filters
+
     enhancedPlaceholder.innerHTML = `
         <div class="spinner"></div>
         <p>Enhancing skin texture...</p>
@@ -179,18 +203,30 @@ async function enhanceImage() {
 
         if (result.success) {
             enhancedImageUrl = result.imageUrl;
+            downloadBtn.disabled = false;
 
-            // If in Demo Mode, activate the Slider!
+            // DEMO MODE: Show Slider
             if (isDemoMode) {
                 activeComparisonView(currentImage, enhancedImageUrl);
-            } else {
-                // Standard View
+                compareBtn.classList.add('hidden');
+            }
+            // USER UPLOAD: Show Side-by-Side + Hold to Compare
+            else {
+                sideBySideContainer.style.display = 'flex';
+                comparisonContainer.style.display = 'none';
+
                 enhancedImage.src = enhancedImageUrl;
                 enhancedImage.classList.remove('hidden');
                 enhancedPlaceholder.classList.add('hidden');
+
+                // If it's a simulated change (same URL), apply visual filter so "Compare" works
+                if (enhancedImageUrl === currentImage) {
+                    enhancedImage.style.filter = 'contrast(1.15) saturate(1.1) sepia(0.15)';
+                }
+
+                compareBtn.classList.remove('hidden');
             }
 
-            downloadBtn.disabled = false;
             showNotification('Enhancement complete! 🎉', 'success');
         }
     } catch (error) {
@@ -198,7 +234,7 @@ async function enhanceImage() {
         showNotification('Enhancement failed.', 'error');
     } finally {
         enhanceBtn.disabled = false;
-        enhanceBtn.innerHTML = `✨ Enhance Skin`;
+        enhanceBtn.innerHTML = `✨ Apply Natural Texture`;
     }
 }
 
@@ -279,12 +315,15 @@ function resetApp() {
     uploadContent.classList.remove('hidden');
     previewArea.classList.add('hidden');
     fileInput.value = '';
+    isDemoMode = false;
 
     // Reset sliders
     denoiseSlider.value = 35;
     if (denoiseValue) denoiseValue.textContent = '35%';
 
     downloadBtn.disabled = true;
+    comparisonContainer.style.display = 'none';
+    if (compareBtn) compareBtn.classList.add('hidden'); // Hide compare button
 }
 
 function showNotification(message, type = 'info') {
