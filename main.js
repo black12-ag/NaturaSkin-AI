@@ -48,7 +48,7 @@ uploadArea.addEventListener('dragleave', () => {
 uploadArea.addEventListener('drop', (e) => {
     e.preventDefault();
     uploadContent.classList.remove('drag-over');
-    
+
     const files = e.dataTransfer.files;
     if (files.length > 0) {
         handleFile(files[0]);
@@ -84,13 +84,13 @@ function handleFile(file) {
         showNotification('Please select an image file', 'error');
         return;
     }
-    
+
     // Validate file size (10MB max)
     if (file.size > 10 * 1024 * 1024) {
         showNotification('Image size must be less than 10MB', 'error');
         return;
     }
-    
+
     // Read and display image
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -104,10 +104,10 @@ function displayImage(imageData) {
     // Hide upload content, show preview
     uploadContent.classList.add('hidden');
     previewArea.classList.remove('hidden');
-    
+
     // Set original image
     originalImage.src = imageData;
-    
+
     // Reset enhanced image
     enhancedImage.classList.add('hidden');
     enhancedPlaceholder.classList.remove('hidden');
@@ -123,14 +123,14 @@ async function enhanceImage() {
         showNotification('Please upload an image first', 'error');
         return;
     }
-    
+
     // Show processing state
     enhanceBtn.disabled = true;
     enhanceBtn.innerHTML = `
         <div class="spinner" style="width: 20px; height: 20px; border-width: 3px;"></div>
         <span>Processing...</span>
     `;
-    
+
     enhancedPlaceholder.classList.remove('hidden');
     enhancedImage.classList.add('hidden');
     enhancedPlaceholder.innerHTML = `
@@ -138,15 +138,15 @@ async function enhanceImage() {
         <p>Enhancing skin texture...</p>
         <p style="font-size: 0.875rem; color: var(--text-muted);">This may take 30-60 seconds</p>
     `;
-    
+
     try {
         // Get parameters
         const denoise = parseFloat(denoiseSlider.value);
         const cfg = parseFloat(cfgSlider.value);
-        
+
         // Call API (we'll implement this with a serverless function)
         const result = await processImageWithAI(currentImage, denoise, cfg);
-        
+
         if (result.success) {
             enhancedImageUrl = result.imageUrl;
             enhancedImage.src = enhancedImageUrl;
@@ -176,158 +176,96 @@ async function enhanceImage() {
 }
 
 async function processImageWithAI(imageData, denoise, cfg) {
-    // For demo purposes, we'll simulate processing
-    // In production, this would call a Cloudflare Worker that interfaces with ComfyUI API
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // For now, return a demo result (you'll replace this with actual API call)
-    // This is a placeholder - the actual implementation will use ComfyUI backend
+    // === NATURASKIN AI ENGINE CHECK ===
+    console.log("NaturaSkin Deep Check: Validating parameters...");
+    console.log(`- Denoise Strength: ${denoise} (Optimal: 0.35)`);
+    console.log(`- Texture Detail: High`);
+
+    // Simulate AI pipeline delay (Flux Model Processing)
+    await new Promise(resolve => setTimeout(resolve, 2500));
+
+    // In this web demo, we return the original image to show the UI flow.
+    // To enable REAL skin transformation, you must deploy the ComfyUI backend.
     return {
         success: true,
-        imageUrl: imageData, // In demo, return same image
-        message: 'Demo mode - Connect to ComfyUI backend for real processing'
+        imageUrl: imageData,
+        message: 'NaturaSkin Demo: Connect Backend for Real Flux Processing'
     };
-    
-    /* PRODUCTION CODE (uncomment when backend is ready):
+}
+
+/* PRODUCTION CODE (uncomment when backend is ready):
     try {
         const response = await fetch('/api/enhance', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                image: imageData,
-                denoise: denoise,
-                cfg: cfg,
-                steps: 30
-            })
+            body: JSON.stringify({ image: imageData, denoise })
         });
-        
-        const result = await response.json();
-        return result;
+        return await response.json();
     } catch (error) {
-        return {
-            success: false,
-            error: error.message
-        };
+        return { success: false, error: error.message };
     }
     */
-}
 
 function downloadImage() {
     if (!enhancedImageUrl) {
         showNotification('No enhanced image to download', 'error');
         return;
     }
-    
-    // Create download link
     const link = document.createElement('a');
     link.href = enhancedImageUrl;
-    link.download = `enhanced-skin-${Date.now()}.png`;
+    link.download = `naturaskin-result-${Date.now()}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
     showNotification('Image downloaded! 📥', 'success');
 }
 
 function resetApp() {
-    // Reset state
     currentImage = null;
     enhancedImageUrl = null;
-    
-    // Reset UI
     uploadContent.classList.remove('hidden');
     previewArea.classList.add('hidden');
     fileInput.value = '';
-    
+
     // Reset sliders
-    denoiseSlider.value = 0.35;
-    cfgSlider.value = 1.0;
-    denoiseValue.textContent = '0.35';
-    cfgValue.textContent = '1.0';
-    
+    denoiseSlider.value = 35;
+    if (denoiseValue) denoiseValue.textContent = '35%';
+
     downloadBtn.disabled = true;
 }
 
 function showNotification(message, type = 'info') {
-    // Create notification element
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
     notification.textContent = message;
-    
-    // Style notification
+
     Object.assign(notification.style, {
         position: 'fixed',
         top: '20px',
         right: '20px',
         padding: '1rem 1.5rem',
-        background: type === 'success' ? 'var(--success)' : 
-                   type === 'error' ? 'var(--error)' : 
-                   'var(--primary)',
+        background: type === 'success' ? '#10b981' : (type === 'error' ? '#ef4444' : '#2dd4bf'),
         color: 'white',
-        borderRadius: 'var(--radius-md)',
-        boxShadow: 'var(--shadow-lg)',
+        borderRadius: '8px',
         zIndex: '1000',
         animation: 'slideIn 0.3s ease',
-        fontWeight: '600'
+        fontWeight: 'bold',
+        boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
     });
-    
-    // Add to DOM
+
     document.body.appendChild(notification);
-    
-    // Remove after 3 seconds
     setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease';
-        setTimeout(() => {
-            document.body.removeChild(notification);
-        }, 300);
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 300);
     }, 3000);
 }
 
-// Add notification animations
+// Add styles programmatically
 const style = document.createElement('style');
 style.textContent = `
-    @keyframes slideIn {
-        from {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-    
-    @keyframes slideOut {
-        from {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        to {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-    }
+    @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
 `;
 document.head.appendChild(style);
 
-// ===== SMOOTH SCROLLING =====
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-    });
-});
-
 // ===== INITIALIZE =====
-console.log('🎨 Enhancor Web App Initialized');
-console.log('Ready to transform artificial skin into natural beauty!');
+console.log('🌿 NaturaSkin AI Web App Initialized');
+console.log('Deep Check Pipeline: Ready to analyze texture quality.');

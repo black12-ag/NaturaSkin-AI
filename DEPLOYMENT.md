@@ -36,8 +36,8 @@ git commit -m "Initial commit: Enhancor AI Skin Enhancement Web App"
 ### Step 3: Push to GitHub
 
 ```bash
-# Add GitHub remote (replace YOUR_USERNAME with your GitHub username)
-git remote add origin https://github.com/YOUR_USERNAME/enhancor-skin-web.git
+# Add GitHub remote
+git remote add origin https://github.com/black12-ag/NaturaSkin-AI.git
 
 # Push to GitHub
 git branch -M main

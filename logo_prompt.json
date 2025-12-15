@@ -1,0 +1,30 @@
+{
+    "meta": {
+        "project": "NaturaSkin AI",
+        "version": "1.0",
+        "usage": "Web Application Header & Favicon"
+    },
+    "image_generation_prompt": {
+        "subject": "Minimalist tech-organic logo for NaturaSkin AI",
+        "visual_elements": [
+            "Stylized abstract human face profile facing right",
+            "One half of the face morphing into a green leaf structure",
+            "A pure water droplet visible near the cheek area"
+        ],
+        "style_modifiers": [
+            "Modern Vector",
+            "Flat Design",
+            "Monoline",
+            "Geometric",
+            "Professional Layout"
+        ],
+        "color_palette": {
+            "primary_teal": "#2dd4bf",
+            "deep_forest_green": "#0f766e",
+            "accent_rose": "#f43f5e",
+            "background": "White or Transparent"
+        },
+        "technical_constraints": "No text, centered composition, high contrast, 1:1 aspect ratio, 4k resolution"
+    },
+    "marketing_rationale": "Combines technology (AI) with nature (Leaf) and hydration (Droplet) to visually communicate 'Natural Skin Restoration'."
+}
