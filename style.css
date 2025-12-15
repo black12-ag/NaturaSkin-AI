@@ -1,5 +1,5 @@
 :root {
-    /* Natural Palette */
+    /* Natural Palette (Dark - Default) */
     --primary: #2dd4bf;
     /* Teal-400 */
     --primary-dark: #0f766e;
@@ -7,7 +7,7 @@
     --secondary: #14b8a6;
     /* Teal-500 */
     --accent: #f43f5e;
-    /* Rose-500 (for lips/warmth) */
+    /* Rose-500 */
 
     --bg-primary: #0f172a;
     /* Slate-900 */
@@ -24,6 +24,97 @@
 
     --font-main: 'Inter', sans-serif;
     --font-display: 'Outfit', sans-serif;
+}
+
+/* Light Theme Variables */
+body.light-theme {
+    --primary: #0d9488;
+    /* Teal-600 */
+    --primary-dark: #115e59;
+    /* Teal-800 */
+    --secondary: #0f766e;
+    /* Teal-700 */
+
+    --bg-primary: #f8fafc;
+    /* Slate-50 */
+    --bg-card: rgba(255, 255, 255, 0.8);
+
+    --text-primary: #0f172a;
+    /* Slate-900 */
+    --text-secondary: #475569;
+    /* Slate-600 */
+
+    --border: rgba(148, 163, 184, 0.2);
+    --shadow-glow: 0 0 20px rgba(13, 148, 136, 0.2);
+    /* Keep gradient consistent but maybe slightly darker for contrast if needed */
+}
+
+/* Settings Controls */
+.settings-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-left: 20px;
+}
+
+.lang-select {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-family: var(--font-main);
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+body.light-theme .lang-select {
+    background: white;
+    border-color: #cbd5e1;
+}
+
+.theme-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+    display: flex;
+    /* Fix alignment */
+    align-items: center;
+    /* Fix alignment */
+    justify-content: center;
+    /* Fix alignment */
+    color: var(--text-primary);
+    /* Ensure icon matches text color */
+}
+
+.theme-btn:hover {
+    transform: rotate(15deg);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+body.light-theme .theme-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+/* RTL Support via Attribute */
+[dir="rtl"] {
+    text-align: right;
+    direction: rtl;
+}
+
+[dir="rtl"] .header-content,
+[dir="rtl"] .hero-actions,
+[dir="rtl"] .nav {
+    flex-direction: row-reverse;
+}
+
+[dir="rtl"] .nav-link {
+    margin-left: 0;
+    margin-right: 20px;
 }
 
 body {

@@ -4,126 +4,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NaturaSkin AI - Natural Skin Texture Enhancement</title>
+    <title data-i18n="title">NaturaSkin AI - Authentic Skin Texture Restoration</title>
     <!-- Social Meta Tags -->
-    <meta name="description"
-        content="Restore authentic, natural skin texture to AI-generated images. Pure, realistic, and free.">
-    <meta property="og:title" content="NaturaSkin AI - Real Skin Texture for AI">
+    <meta property="og:title" content="NaturaSkin AI - Natural Skin Texture Engine">
     <meta property="og:description"
-        content="Fix the plastic look of AI portraits with our free Flux-based enhancement tool.">
-    <meta property="og:image" content="/assets/logo.png">
+        content="Fix the 'plastic AI look' instantly. Add realistic pores and film grain directly in your browser.">
+    <meta property="og:image" content="https://naturaskin-ai.pages.dev/assets/social-preview.jpg">
+    <meta property="og:url" content="https://naturaskin-ai.pages.dev">
+    <meta name="twitter:card" content="summary_large_image">
 
-    <!-- Favicon & Fonts -->
     <link rel="icon" type="image/png" href="/assets/logo.png">
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="style.css">
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=calistoga&family=Inter:wght@300;400;600&family=Outfit:wght@400;600;700&display=swap"
         rel="stylesheet">
 </head>
 
 <body>
-    <!-- Header -->
+
     <header class="header">
         <div class="container">
             <div class="header-content">
                 <a href="/" class="logo" style="text-decoration: none; display: flex; align-items: center; gap: 10px;">
                     <img src="/assets/logo.png" alt="NaturaSkin AI" class="logo-img" style="height: 40px; width: auto;">
-                    <h1 class="logo-text">NaturaSkin AI</h1>
+                    <h1 class="logo-text" data-i18n="title">NaturaSkin AI</h1>
                 </a>
-                <nav class="nav">
-                    <a href="#demo" class="nav-link">Live Demo</a>
-                    <a href="#technology" class="nav-link">Technology</a>
-                    <a href="https://github.com/black12-ag/NaturaSkin-AI" target="_blank" class="nav-link">GitHub</a>
-                </nav>
+
+                <div class="header-right" style="display: flex; align-items: center; gap: 20px;">
+                    <nav class="nav">
+                        <a href="#demo" class="nav-link" data-i18n="nav_demo">Live Demo</a>
+                        <a href="#technology" class="nav-link" data-i18n="nav_tech">Technology</a>
+                        <a href="https://github.com/black12-ag/NaturaSkin-AI" class="nav-link" target="_blank"
+                            data-i18n="nav_github">GitHub</a>
+                    </nav>
+
+                    <div class="settings-controls">
+                        <!-- Language Selector -->
+                        <select id="langSelect" class="lang-select">
+                            <option value="en">🇬🇧 English</option>
+                            <option value="am">🇪🇹 አማርኛ</option>
+                            <option value="ar">🇸🇦 العربية</option>
+                            <option value="es">🇪🇸 Español</option>
+                            <option value="fr">🇫🇷 Français</option>
+                            <option value="ru">🇷🇺 Русский</option>
+                            <option value="zh">🇨🇳 中文</option>
+                            <option value="pt">🇵🇹 Português</option>
+                        </select>
+
+                        <!-- Theme Toggle -->
+                        <button id="themeToggle" class="theme-btn" aria-label="Toggle Theme">
+                            <span class="icon-sun">☀️</span>
+                            <span class="icon-moon hidden">🌙</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <div class="hero-badge">
-                    <span class="badge-icon">✨</span>
-                    <span>100% Free Open Source Tool</span>
-                </div>
-                <h2 class="hero-title">
-                    Bring <span class="gradient-text">Real Life</span><br>
-                    Back to AI Skin
-                </h2>
-                <p class="hero-description">
-                    Remove the "plastic" look. Our specialized Flux-based pipeline injects realistic pores, texture, and
-                    natural imperfections into AI portraits.
-                </p>
-                <div class="hero-actions" style="margin-top: 2rem;">
-                    <button class="btn btn-primary" id="tryDemoBtn" style="padding: 1rem 2rem; font-size: 1.1rem;">✨ Try
-                        Live Demo with Pre-loaded Image</button>
-                    <p style="margin-top: 10px; font-size: 0.9rem; color: var(--text-secondary);">or scroll down to
-                        upload your own</p>
+    <main>
+        <section class="hero">
+            <div class="container">
+                <span class="hero-badge" data-i18n="hero_badge">✨ Now with Offline Client-Side Engine</span>
+                <h2 class="hero-title" data-i18n="hero_title">Authentic Skin Texture, <span
+                        class="gradient-text">Restored Instantly.</span></h2>
+                <p class="hero-desc" data-i18n="hero_desc">The first AI that fixes the "plastic look" of generated
+                    images. Add realistic pores, micro-details, and film grain directly in your browser.</p>
+                <div class="hero-actions">
+                    <button class="btn btn-primary" id="tryDemoBtn" data-i18n="hero_cta">✨ Try Live Demo</button>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Main Tool -->
-    <section class="enhancement-section" id="demo">
-        <div class="container">
-            <div class="enhancement-card">
-                <div class="upload-area" id="uploadArea">
-                    <input type="file" id="fileInput" accept="image/*" hidden>
-                    <div class="upload-content" id="uploadContent">
-                        <div class="upload-icon">🍃</div>
-                        <h3 class="upload-title">Upload Portrait</h3>
-                        <p class="upload-description">Drag & drop or click to browse</p>
-                        <button class="btn btn-primary" id="browseBtn">Select Image</button>
+        <section id="demo" class="tool-section">
+            <div class="container">
+                <div class="enhancement-card">
+                    <h3 style="margin-bottom: 30px; font-family: 'Outfit';" data-i18n="demo_title">Experience the
+                        Difference</h3>
+
+                    <div class="preview-container hidden" id="previewArea">
+                        <div class="side-by-side" id="sideBySideContainer"
+                            style="display: flex; gap: 20px; width: 100%;">
+                            <div class="preview-box">
+                                <img id="originalImage" src="" alt="Original">
+                                <p style="margin-top: 10px; opacity: 0.7;">Original</p>
+                            </div>
+                            <div class="arrow-divider">➝</div>
+                            <div class="preview-box">
+                                <div id="enhancedPlaceholder" class="enhanced-placeholder">
+                                    <div style="font-size: 3rem;">🎨</div>
+                                    <p>Ready to enhance</p>
+                                </div>
+                                <img id="enhancedImage" class="hidden" src="" alt="Enhanced">
+                                <p style="margin-top: 10px; opacity: 0.7; color: var(--primary);">NaturaSkin Result</p>
+                            </div>
+                        </div>
+
+                        <!-- Comparison Slider View (Initially Hidden) -->
+                        <div class="comparison-container hidden" id="comparisonContainer">
+                            <img id="compAfter" src="" alt="After">
+                            <img id="compBefore" src="" alt="Before">
+                            <div class="slider-handle"></div>
+                            <div class="slider-label" style="left: 10px;">Original</div>
+                            <div class="slider-label" style="right: 10px;">NaturaSkin</div>
+                        </div>
                     </div>
 
-                    <!-- Preview -->
-                    <div class="preview-area hidden" id="previewArea">
-                        <!-- Before/After Comparison Container -->
-                        <div class="comparison-container" id="comparisonContainer"
-                            style="position: relative; width: 100%; max-width: 600px; margin: 0 auto 30px; border-radius: 12px; overflow: hidden; cursor: col-resize; display: none;">
-                            <img id="compAfter" src="" style="width: 100%; display: block;">
-                            <img id="compBefore" src=""
-                                style="position: absolute; top: 0; left: 0; height: 100%; width: 50%; object-fit: cover; object-position: left; border-right: 2px solid white;">
-                            <div class="slider-handle"
-                                style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
-                                ↔️
-                            </div>
-                            <div class="labels"
-                                style="position: absolute; bottom: 20px; left: 20px; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 4px;">
-                                Before</div>
-                            <div class="labels"
-                                style="position: absolute; bottom: 20px; right: 20px; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 4px;">
-                                After</div>
+                    <div class="upload-area" id="uploadArea">
+                        <input type="file" id="fileInput" accept="image/*" class="hidden">
+                        <div class="upload-content" id="uploadContent">
+                            <div class="upload-icon">📁</div>
+                            <h3 data-i18n="upload_text">Drop your AI image here or click to browse</h3>
+                            <p data-i18n="upload_sub">Supports PNG, JPG, WEBP (Max 10MB)</p>
+                            <button class="btn btn-secondary" id="browseBtn">Browse Files</button>
                         </div>
+                    </div>
 
-                        <!-- Standard Side-by-Side (Fallback) -->
-                        <div class="preview-container" id="sideBySideContainer">
-                            <div class="preview-box">
-                                <h4>Original</h4>
-                                <img id="originalImage" src="" alt="Original">
-                            </div>
-                            <div class="arrow-divider">→</div>
-                            <div class="preview-box">
-                                <h4>NaturaSkin Result</h4>
-                                <div class="enhanced-placeholder" id="enhancedPlaceholder">
-                                    <div class="spinner"></div>
-                                    <p>Analyzing Skin Texture...</p>
-                                </div>
-                                <img id="enhancedImage" src="" alt="Enhanced" class="hidden">
-                            </div>
-                        </div>
-
-                        <div class="controls">
-                            <div class="control-group">
-                                <label>Texture Intensity: <span id="denoiseValue">35%</span></label>
-                                <input type="range" id="denoiseSlider" min="20" max="50" value="35">
-                            </div>
+                    <div class="controls">
+                        <div class="control-group">
+                            <label data-i18n="slider_label">Texture Intensity: <span
+                                    id="denoiseValue">35%</span></label>
+                            <input type="range" id="denoiseSlider" min="20" max="50" value="35">
                         </div>
 
                         <div class="action-buttons">
-                            <button class="btn btn-primary" id="enhanceBtn">✨ Apply Natural Texture</button>
                             <button class="btn btn-secondary hidden" id="compareBtn" style="cursor: grab;">👁️ Hold to
                                 Compare</button>
                             <button class="btn btn-secondary" id="downloadBtn" disabled>Download</button>
@@ -132,38 +136,38 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+            </div>
+        </section>
 
-    <!-- Deep Check / Technology -->
-    <section class="features" id="technology">
-        <div class="container">
-            <h2 class="section-title">The "Deep Check" Pipeline</h2>
-            <div class="tech-grid">
-                <div class="tech-card">
-                    <h3>1. Segmentation</h3>
-                    <p>Identifies skin regions automatically.</p>
-                </div>
-                <div class="tech-card">
-                    <h3>2. Flux Sampling</h3>
-                    <p>Re-samples texture using the Flux.1 model.</p>
-                </div>
-                <div class="tech-card">
-                    <h3>3. Detail Injection</h3>
-                    <p>Adds micropores and film grain.</p>
+        <!-- Deep Check / Technology -->
+        <section class="features" id="technology">
+            <div class="container">
+                <h2 class="section-title">The "Deep Check" Pipeline</h2>
+                <div class="tech-grid">
+                    <div class="tech-card">
+                        <h3>1. Segmentation</h3>
+                        <p>Identifies skin regions automatically.</p>
+                    </div>
+                    <div class="tech-card">
+                        <h3>2. Flux Sampling</h3>
+                        <p>Re-samples texture using the Flux.1 model.</p>
+                    </div>
+                    <div class="tech-card">
+                        <h3>3. Detail Injection</h3>
+                        <p>Adds micropores and film grain.</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <footer class="footer">
-        <div class="container" style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
-            <img src="/assets/logo.png" alt="NaturaSkin Logo" style="height: 30px; opacity: 0.7;">
-            <p>&copy; 2025 Munir Kabir. Open Source Project.</p>
-        </div>
-    </footer>
+        <footer class="footer">
+            <div class="container" style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                <img src="/assets/logo.png" alt="NaturaSkin Logo" style="height: 30px; opacity: 0.7;">
+                <p>&copy; 2025 Munir Kabir. Open Source Project.</p>
+            </div>
+        </footer>
 
-    <script type="module" src="/main.js"></script>
+        <script type="module" src="/main.js"></script>
 </body>
 
 </html>

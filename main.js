@@ -1,7 +1,12 @@
+// ===== IMPORTS =====
+import { translations } from './translations.js';
+
 // ===== STATE MANAGEMENT =====
 let currentImage = null;
 let enhancedImageUrl = null;
 let isDemoMode = false;
+let currentLang = localStorage.getItem('naturaskin_lang') || 'en';
+let isDarkTheme = localStorage.getItem('naturaskin_theme') !== 'light'; // Default to dark
 
 // ===== DOM ELEMENTS =====
 const uploadArea = document.getElementById('uploadArea');
@@ -10,9 +15,69 @@ const previewArea = document.getElementById('previewArea');
 const fileInput = document.getElementById('fileInput');
 const browseBtn = document.getElementById('browseBtn');
 const tryDemoBtn = document.getElementById('tryDemoBtn');
-const compareBtn = document.getElementById('compareBtn'); // Added missing reference
+const compareBtn = document.getElementById('compareBtn');
 const originalImage = document.getElementById('originalImage');
 const enhancedImage = document.getElementById('enhancedImage');
+
+// Settings Elements
+const langSelect = document.getElementById('langSelect');
+const themeToggle = document.getElementById('themeToggle');
+const iconSun = themeToggle.querySelector('.icon-sun');
+const iconMoon = themeToggle.querySelector('.icon-moon');
+
+// ===== I18N & THEME FUNCTIONALITY =====
+
+function updateLanguage(lang) {
+    currentLang = lang;
+    localStorage.setItem('naturaskin_lang', lang);
+    langSelect.value = lang;
+
+    // Apply translations
+    const elements = document.querySelectorAll('[data-i18n]');
+    elements.forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[lang] && translations[lang][key]) {
+            // Preserve HTML if needed (e.g., gradient text) or just text
+            if (key === 'hero_title') {
+                el.innerHTML = translations[lang][key];
+            } else {
+                el.textContent = translations[lang][key];
+            }
+        }
+    });
+
+    // Handle RTL (Right-to-Left) languages
+    if (['ar', 'he'].includes(lang)) {
+        document.documentElement.dir = 'rtl';
+    } else {
+        document.documentElement.dir = 'ltr';
+    }
+}
+
+function updateTheme() {
+    if (isDarkTheme) {
+        document.body.classList.remove('light-theme');
+        iconSun.classList.remove('hidden');
+        iconMoon.classList.add('hidden');
+        localStorage.setItem('naturaskin_theme', 'dark');
+    } else {
+        document.body.classList.add('light-theme');
+        iconSun.classList.add('hidden');
+        iconMoon.classList.remove('hidden');
+        localStorage.setItem('naturaskin_theme', 'light');
+    }
+}
+
+// Initialize Settings
+updateLanguage(currentLang);
+updateTheme();
+
+// Event Listeners for Settings
+langSelect.addEventListener('change', (e) => updateLanguage(e.target.value));
+themeToggle.addEventListener('click', () => {
+    isDarkTheme = !isDarkTheme;
+    updateTheme();
+});
 
 
 const enhancedPlaceholder = document.getElementById('enhancedPlaceholder');
