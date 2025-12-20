@@ -172,14 +172,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 isProMode = true;
                 engineBadge.textContent = 'LINKED';
                 engineBadge.className = 'badge badge-pro';
-                connectionStatus.textContent = `🟢 Connected to ${address}`;
+                connectionStatus.innerHTML = `🟢 <b>Connected!</b> Ready to process images.`;
                 showNotification('Connected to Local AI Engine! 🚀', 'success');
             } else {
-                engineBadge.textContent = 'ERROR';
+                engineBadge.textContent = 'WAITING';
                 engineBadge.className = 'badge badge-demo';
-                connectionStatus.textContent = '❌ Connection failed. Check Console/CORS.';
-                showNotification('Could not connect. Ensure ComfyUI > main.py --enable-cors-header "*"', 'error');
-                // e.target.checked = false; // Let them keep trying
+                // Provide a helpful clickable link to the guide
+                connectionStatus.innerHTML = `⚠️ <b>Connection Failed.</b> <br> <small>1. Is Colab running? <br> 2. Did you verify the Cloudflare link? <a href="https://github.com/black12-ag/NaturaSkin-AI/blob/master/MANUAL.md" target="_blank" style="color:var(--primary); text-decoration:underline;">Help</a></small>`;
+                showNotification('Could not connect. Please check the Server Address.', 'error');
             }
         } else {
             isProMode = false;
@@ -243,10 +243,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function startDemoMode() {
         isDemoMode = true;
-        const demoSrc = '/assets/demo_before.png';
+        const demoSrc = 'assets/demo_before.png'; // Relative path
         currentImage = demoSrc;
-        displayImage(demoSrc);
-        showNotification('Demo loaded! Click "Enhance" to see the magic ✨', 'success');
+
+        // precise loading check
+        const img = new Image();
+        img.onload = () => {
+            displayImage(demoSrc);
+            showNotification('Demo loaded! Click "Enhance" to see the magic ✨', 'success');
+        };
+        img.onerror = () => {
+            console.error("Failed to load demo image:", demoSrc);
+            showNotification('Could not load demo image. Check assets folder.', 'error');
+            // Try root fallback
+            if (!demoSrc.startsWith('/')) displayImage('/' + demoSrc);
+        };
+        img.src = demoSrc;
     }
 
     function handleFileSelect(e) {
