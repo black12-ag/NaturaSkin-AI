@@ -138,426 +138,446 @@ uploadArea.addEventListener('drop', (e) => {
     if (files.length > 0) {
         handleFile(files[0]);
     }
-});
+    // ===== DOM ELEMENTS & EVENT LISTENERS =====
+    // Wrapped in event listener to ensure DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
 
-// Slider updates
-denoiseSlider.addEventListener('input', (e) => {
-    denoiseValue.textContent = e.target.value + '%';
-});
+        // Slider updates
+        denoiseSlider.addEventListener('input', (e) => {
+            denoiseValue.textContent = e.target.value + '%';
+        });
 
-// AI Engine Toggle
-const aiEngineToggle = document.getElementById('aiEngineToggle');
-const engineBadge = document.getElementById('engineBadge');
-const connectionStatus = document.getElementById('connectionStatus');
-const serverConfig = document.getElementById('serverConfig');
-const serverUrlInput = document.getElementById('serverUrl');
+        // AI Engine Toggle
+        const aiEngineToggle = document.getElementById('aiEngineToggle');
+        const engineBadge = document.getElementById('engineBadge');
+        const connectionStatus = document.getElementById('connectionStatus');
+        const serverConfig = document.getElementById('serverConfig');
+        const serverUrlInput = document.getElementById('serverUrl');
 
-const comfyClient = new ComfyClient();
-let isProMode = false;
+        const comfyClient = new ComfyClient();
+        let isProMode = false;
 
-aiEngineToggle.addEventListener('change', async (e) => {
-    if (e.target.checked) {
-        serverConfig.style.display = 'block';
-        const address = serverUrlInput.value.trim();
-        comfyClient.updateAddress(address);
+        aiEngineToggle.addEventListener('change', async (e) => {
+            if (e.target.checked) {
+                serverConfig.style.display = 'block';
+                const address = serverUrlInput.value.trim();
+                comfyClient.updateAddress(address);
 
-        connectionStatus.textContent = `Connecting to ${address}...`;
-        const connected = await comfyClient.connect();
+                connectionStatus.textContent = `Connecting to ${address}...`;
+                const connected = await comfyClient.connect();
 
-        if (connected) {
-            isProMode = true;
-            engineBadge.textContent = 'LINKED';
-            engineBadge.className = 'badge badge-pro';
-            connectionStatus.textContent = `🟢 Connected to ${address}`;
-            showNotification('Connected to Local AI Engine! 🚀', 'success');
+                if (connected) {
+                    isProMode = true;
+                    engineBadge.textContent = 'LINKED';
+                    engineBadge.className = 'badge badge-pro';
+                    connectionStatus.textContent = `🟢 Connected to ${address}`;
+                    showNotification('Connected to Local AI Engine! 🚀', 'success');
+                } else {
+                    engineBadge.textContent = 'ERROR';
+                    engineBadge.className = 'badge badge-demo';
+                    connectionStatus.textContent = '❌ Connection failed. Check Console/CORS.';
+                    showNotification('Could not connect. Ensure ComfyUI > main.py --enable-cors-header "*"', 'error');
+                    // e.target.checked = false; // Let them keep trying
+                }
+            } else {
+                isProMode = false;
+                engineBadge.textContent = 'OFFLINE';
+                engineBadge.className = 'badge badge-demo';
+                connectionStatus.textContent = 'Using client-side simulation.';
+            }
+        });
+
+        // Auto-Load Server URL
+        const savedUrl = localStorage.getItem('naturaskin_server_url');
+        if (savedUrl) {
+            serverUrlInput.value = savedUrl;
+            // Optional: Auto-connect if cached?
+            // aiEngineToggle.checked = true;
+            // aiEngineToggle.dispatchEvent(new Event('change'));
         } else {
-            engineBadge.textContent = 'ERROR';
-            engineBadge.className = 'badge badge-demo';
-            connectionStatus.textContent = '❌ Connection failed. Check Console/CORS.';
-            showNotification('Could not connect. Ensure ComfyUI > main.py --enable-cors-header "*"', 'error');
-            // e.target.checked = false; // Let them keep trying
+            // Default fallback
+            serverUrlInput.value = '127.0.0.1:8188';
         }
-    } else {
-        isProMode = false;
-        engineBadge.textContent = 'OFFLINE';
-        engineBadge.className = 'badge badge-demo';
-        connectionStatus.textContent = 'Using client-side simulation.';
-    }
-});
 
-// Update connection when URL changes if toggle is on
-serverUrlInput.addEventListener('change', async () => {
-    if (aiEngineToggle.checked) {
-        // Trigger reconnect logic
-        const event = new Event('change');
-        aiEngineToggle.dispatchEvent(event);
-    }
-});
+        // Update connection when URL changes if toggle is on
+        serverUrlInput.addEventListener('change', async () => {
+            // Save to localStorage
+            localStorage.setItem('naturaskin_server_url', serverUrlInput.value.trim());
 
-// Button actions
-enhanceBtn.addEventListener('click', enhanceImage);
-downloadBtn.addEventListener('click', downloadImage);
-resetBtn.addEventListener('click', resetApp);
+            if (aiEngineToggle.checked) {
+                // Trigger reconnect logic
+                const event = new Event('change');
+                aiEngineToggle.dispatchEvent(event);
+            }
+        });
 
-// Comparison Slider Logic
-let isDragging = false;
-comparisonContainer.addEventListener('mousedown', () => isDragging = true);
-document.addEventListener('mouseup', () => isDragging = false);
-comparisonContainer.addEventListener('mousemove', (e) => {
-    if (!isDragging) return;
-    updateSlider(e);
-});
-comparisonContainer.addEventListener('click', updateSlider);
+        // Button actions
+        enhanceBtn.addEventListener('click', enhanceImage);
+        downloadBtn.addEventListener('click', downloadImage);
+        resetBtn.addEventListener('click', resetApp);
 
-function updateSlider(e) {
-    const rect = comparisonContainer.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    let percentage = (x / rect.width) * 100;
-    percentage = Math.max(0, Math.min(100, percentage));
+        // Comparison Slider Logic
+        let isDragging = false;
+        comparisonContainer.addEventListener('mousedown', () => isDragging = true);
+        document.addEventListener('mouseup', () => isDragging = false);
+        comparisonContainer.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            updateSlider(e);
+        });
+        comparisonContainer.addEventListener('click', updateSlider);
 
-    compBefore.style.width = percentage + '%';
-    sliderHandle.style.left = percentage + '%';
-}
+        function updateSlider(e) {
+            const rect = comparisonContainer.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            let percentage = (x / rect.width) * 100;
+            percentage = Math.max(0, Math.min(100, percentage));
+
+            compBefore.style.width = percentage + '%';
+            sliderHandle.style.left = percentage + '%';
+        }
 
 
-// ===== FUNCTIONS =====
+        // ===== FUNCTIONS =====
 
-function startDemoMode() {
-    isDemoMode = true;
-    const demoSrc = '/assets/demo_before.png';
-    currentImage = demoSrc;
-    displayImage(demoSrc);
-    showNotification('Demo loaded! Click "Enhance" to see the magic ✨', 'success');
-}
+        function startDemoMode() {
+            isDemoMode = true;
+            const demoSrc = '/assets/demo_before.png';
+            currentImage = demoSrc;
+            displayImage(demoSrc);
+            showNotification('Demo loaded! Click "Enhance" to see the magic ✨', 'success');
+        }
 
-function handleFileSelect(e) {
-    isDemoMode = false;
-    const file = e.target.files[0];
-    if (file) {
-        handleFile(file);
-    }
-}
+        function handleFileSelect(e) {
+            isDemoMode = false;
+            const file = e.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
 
-function handleFile(file) {
-    if (!file.type.startsWith('image/')) {
-        showNotification('Please select an image file', 'error');
-        return;
-    }
-    if (file.size > 10 * 1024 * 1024) {
-        showNotification('Image size must be less than 10MB', 'error');
-        return;
-    }
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                showNotification('Please select an image file', 'error');
+                return;
+            }
+            if (file.size > 10 * 1024 * 1024) {
+                showNotification('Image size must be less than 10MB', 'error');
+                return;
+            }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        currentImage = e.target.result;
-        displayImage(currentImage);
-    };
-    reader.readAsDataURL(file);
-}
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                currentImage = e.target.result;
+                displayImage(currentImage);
+            };
+            reader.readAsDataURL(file);
+        }
 
-function displayImage(imageData) {
-    uploadContent.classList.add('hidden');
-    previewArea.classList.remove('hidden');
+        function displayImage(imageData) {
+            uploadContent.classList.add('hidden');
+            previewArea.classList.remove('hidden');
 
-    // Hide comparison initially
-    comparisonContainer.style.display = 'none';
-    sideBySideContainer.style.display = 'flex';
+            // Hide comparison initially
+            comparisonContainer.style.display = 'none';
+            sideBySideContainer.style.display = 'flex';
 
-    originalImage.src = imageData;
-    enhancedImage.classList.add('hidden');
-    enhancedPlaceholder.classList.remove('hidden');
+            originalImage.src = imageData;
+            enhancedImage.classList.add('hidden');
+            enhancedPlaceholder.classList.remove('hidden');
 
-    // Reset enhanced placeholder text
-    enhancedPlaceholder.innerHTML = `
+            // Reset enhanced placeholder text
+            enhancedPlaceholder.innerHTML = `
         <div style="font-size: 3rem;">🎨</div>
         <p>Ready to enhance</p>
     `;
-    downloadBtn.disabled = true;
-}
-
-function showOriginal() {
-    if (!enhancedImage.classList.contains('hidden')) {
-        enhancedImage.src = currentImage; // Temporarily swap src
-        // Remove filter if applied
-        enhancedImage.style.filter = 'none';
-    }
-}
-
-function showEnhanced() {
-    if (!enhancedImage.classList.contains('hidden') && enhancedImageUrl) {
-        enhancedImage.src = enhancedImageUrl;
-        // Re-apply filter if it was a simulated user upload
-        if (!isDemoMode && enhancedImageUrl === currentImage) {
-            enhancedImage.style.filter = 'contrast(1.15) saturate(1.1) sepia(0.15)';
+            downloadBtn.disabled = true;
         }
-    }
-}
 
-async function enhanceImage() {
-    if (!currentImage) return;
+        function showOriginal() {
+            if (!enhancedImage.classList.contains('hidden')) {
+                enhancedImage.src = currentImage; // Temporarily swap src
+                // Remove filter if applied
+                enhancedImage.style.filter = 'none';
+            }
+        }
 
-    enhanceBtn.disabled = true;
-    enhanceBtn.innerHTML = `<span class="spinner"></span> Processing...`;
-    compareBtn.classList.add('hidden'); // Hide during processing
+        function showEnhanced() {
+            if (!enhancedImage.classList.contains('hidden') && enhancedImageUrl) {
+                enhancedImage.src = enhancedImageUrl;
+                // Re-apply filter if it was a simulated user upload
+                if (!isDemoMode && enhancedImageUrl === currentImage) {
+                    enhancedImage.style.filter = 'contrast(1.15) saturate(1.1) sepia(0.15)';
+                }
+            }
+        }
 
-    enhancedPlaceholder.classList.remove('hidden');
-    enhancedImage.classList.add('hidden');
-    enhancedImage.style.filter = 'none'; // Reset filters
+        async function enhanceImage() {
+            if (!currentImage) return;
 
-    enhancedPlaceholder.innerHTML = `
+            enhanceBtn.disabled = true;
+            enhanceBtn.innerHTML = `<span class="spinner"></span> Processing...`;
+            compareBtn.classList.add('hidden'); // Hide during processing
+
+            enhancedPlaceholder.classList.remove('hidden');
+            enhancedImage.classList.add('hidden');
+            enhancedImage.style.filter = 'none'; // Reset filters
+
+            enhancedPlaceholder.innerHTML = `
         <div class="spinner"></div>
         <p>Enhancing skin texture...</p>
     `;
 
-    try {
-        const denoise = parseFloat(denoiseSlider.value);
+            try {
+                const denoise = parseFloat(denoiseSlider.value);
 
-        // Call Processing
-        const result = await processImageWithAI(currentImage, denoise);
+                // Call Processing
+                const result = await processImageWithAI(currentImage, denoise);
 
-        if (result.success) {
-            enhancedImageUrl = result.imageUrl;
-            downloadBtn.disabled = false;
+                if (result.success) {
+                    enhancedImageUrl = result.imageUrl;
+                    downloadBtn.disabled = false;
 
-            // DEMO MODE: Show Slider
-            if (isDemoMode) {
-                activeComparisonView(currentImage, enhancedImageUrl);
-                compareBtn.classList.add('hidden');
-            }
-            // USER UPLOAD: Show Side-by-Side + Hold to Compare
-            else {
-                sideBySideContainer.style.display = 'flex';
-                comparisonContainer.style.display = 'none';
+                    // DEMO MODE: Show Slider
+                    if (isDemoMode) {
+                        activeComparisonView(currentImage, enhancedImageUrl);
+                        compareBtn.classList.add('hidden');
+                    }
+                    // USER UPLOAD: Show Side-by-Side + Hold to Compare
+                    else {
+                        sideBySideContainer.style.display = 'flex';
+                        comparisonContainer.style.display = 'none';
 
-                enhancedImage.src = enhancedImageUrl;
-                enhancedImage.classList.remove('hidden');
-                enhancedPlaceholder.classList.add('hidden');
+                        enhancedImage.src = enhancedImageUrl;
+                        enhancedImage.classList.remove('hidden');
+                        enhancedPlaceholder.classList.add('hidden');
 
-                // If it's a simulated change (same URL), apply visual filter so "Compare" works
-                if (enhancedImageUrl === currentImage) {
-                    enhancedImage.style.filter = 'contrast(1.15) saturate(1.1) sepia(0.15)';
+                        // If it's a simulated change (same URL), apply visual filter so "Compare" works
+                        if (enhancedImageUrl === currentImage) {
+                            enhancedImage.style.filter = 'contrast(1.15) saturate(1.1) sepia(0.15)';
+                        }
+
+                        compareBtn.classList.remove('hidden');
+                    }
+
+                    showNotification('Enhancement complete! 🎉', 'success');
                 }
-
-                compareBtn.classList.remove('hidden');
+            } catch (error) {
+                console.error(error);
+                showNotification('Enhancement failed.', 'error');
+            } finally {
+                enhanceBtn.disabled = false;
+                enhanceBtn.innerHTML = `✨ Apply Natural Texture`;
             }
-
-            showNotification('Enhancement complete! 🎉', 'success');
         }
-    } catch (error) {
-        console.error(error);
-        showNotification('Enhancement failed.', 'error');
-    } finally {
-        enhanceBtn.disabled = false;
-        enhanceBtn.innerHTML = `✨ Apply Natural Texture`;
-    }
-}
 
-// ===== CLIENT-SIDE TEXTURE ENGINE =====
-// This allows the app to work 100% offline without a backend server.
+        // ===== CLIENT-SIDE TEXTURE ENGINE =====
+        // This allows the app to work 100% offline without a backend server.
 
-function applyTextureToImage(imageSrc, intensity) {
-    return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
+        function applyTextureToImage(imageSrc, intensity) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
 
-            canvas.width = img.width;
-            canvas.height = img.height;
+                    canvas.width = img.width;
+                    canvas.height = img.height;
 
-            // Draw original image
-            ctx.drawImage(img, 0, 0);
+                    // Draw original image
+                    ctx.drawImage(img, 0, 0);
 
-            // Get pixel data
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const data = imageData.data;
+                    // Get pixel data
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imageData.data;
 
-            // FLUX-INSPIRED TEXTURE ALGORITHM
-            // We add monochromatic noise to simulate "micropores" and film grain
-            // This destroys the "plastic" look of AI images.
+                    // FLUX-INSPIRED TEXTURE ALGORITHM
+                    // We add monochromatic noise to simulate "micropores" and film grain
+                    // This destroys the "plastic" look of AI images.
 
-            const noiseStrength = (intensity - 10) * 1.5; // Map 20-50 slider to useful noise levels
+                    const noiseStrength = (intensity - 10) * 1.5; // Map 20-50 slider to useful noise levels
 
-            for (let i = 0; i < data.length; i += 4) {
-                // Generate random noise (-1 to 1)
-                const random = (Math.random() - 0.5) * noiseStrength;
+                    for (let i = 0; i < data.length; i += 4) {
+                        // Generate random noise (-1 to 1)
+                        const random = (Math.random() - 0.5) * noiseStrength;
 
-                // Add noise to RGB channels (Grain)
-                data[i] = Math.min(255, Math.max(0, data[i] + random));     // R
-                data[i + 1] = Math.min(255, Math.max(0, data[i + 1] + random)); // G
-                data[i + 2] = Math.min(255, Math.max(0, data[i + 2] + random)); // B
+                        // Add noise to RGB channels (Grain)
+                        data[i] = Math.min(255, Math.max(0, data[i] + random));     // R
+                        data[i + 1] = Math.min(255, Math.max(0, data[i + 1] + random)); // G
+                        data[i + 2] = Math.min(255, Math.max(0, data[i + 2] + random)); // B
 
-                // No change to Alpha (data[i+3])
+                        // No change to Alpha (data[i+3])
+                    }
+
+                    // Put modified pixels back
+                    ctx.putImageData(imageData, 0, 0);
+
+                    // Apply subtle sharpening (Simulated via overlay)
+                    // We use a composite operation to enhance contrast slightly
+                    ctx.globalCompositeOperation = 'overlay';
+                    ctx.fillStyle = 'rgba(128, 128, 128, 0.1)'; // Neutral grey overlay
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    // Return processed image as Data URL
+                    resolve(canvas.toDataURL('image/jpeg', 0.95));
+                };
+                img.onerror = reject;
+                img.src = imageSrc;
+            });
+        }
+
+        async function processImageWithAI(imageData, denoise) {
+            // If DEMO MODE is active, we return the pre-baked "After" image
+            if (isDemoMode) {
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                return {
+                    success: true,
+                    imageUrl: '/assets/demo_after.png'
+                };
             }
 
-            // Put modified pixels back
-            ctx.putImageData(imageData, 0, 0);
-
-            // Apply subtle sharpening (Simulated via overlay)
-            // We use a composite operation to enhance contrast slightly
-            ctx.globalCompositeOperation = 'overlay';
-            ctx.fillStyle = 'rgba(128, 128, 128, 0.1)'; // Neutral grey overlay
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Return processed image as Data URL
-            resolve(canvas.toDataURL('image/jpeg', 0.95));
-        };
-        img.onerror = reject;
-        img.src = imageSrc;
-    });
-}
-
-async function processImageWithAI(imageData, denoise) {
-    // If DEMO MODE is active, we return the pre-baked "After" image
-    if (isDemoMode) {
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        return {
-            success: true,
-            imageUrl: '/assets/demo_after.png'
-        };
-    }
-
-    // PRO MODE (Local ComfyUI)
-    if (isProMode) {
-        try {
-            console.log("Using Local AI Engine...");
-            enhancedPlaceholder.innerHTML = `
+            // PRO MODE (Local ComfyUI)
+            if (isProMode) {
+                try {
+                    console.log("Using Local AI Engine...");
+                    enhancedPlaceholder.innerHTML = `
                 <div class="spinner"></div>
                 <p>Uploading to AI Engine...</p>
             `;
 
-            // 1. Upload
-            // Need to convert DataURL to File/Blob
-            const res = await fetch(imageData);
-            const blob = await res.blob();
-            const file = new File([blob], "input.png", { type: "image/png" });
-            const uploadRes = await comfyClient.uploadImage(file);
-            const filename = uploadRes.name; // Usually input.png or timestamped
+                    // 1. Upload
+                    // Need to convert DataURL to File/Blob
+                    const res = await fetch(imageData);
+                    const blob = await res.blob();
+                    const file = new File([blob], "input.png", { type: "image/png" });
+                    const uploadRes = await comfyClient.uploadImage(file);
+                    const filename = uploadRes.name; // Usually input.png or timestamped
 
-            // 2. Queue
-            enhancedPlaceholder.innerHTML = `
+                    // 2. Queue
+                    enhancedPlaceholder.innerHTML = `
                 <div class="spinner"></div>
                 <p>Generating skin texture...</p>
             `;
 
-            // Map 20-50 slider to 0.20-0.50
-            const denoiseFloat = denoise / 100;
-            const cfg = 1.0; // Default or add slider
+                    // Map 20-50 slider to 0.20-0.50
+                    const denoiseFloat = denoise / 100;
+                    const cfg = 1.0; // Default or add slider
 
-            const queueRes = await comfyClient.queuePrompt({
-                denoise: denoiseFloat,
-                cfg: cfg,
-                inputImage: filename
+                    const queueRes = await comfyClient.queuePrompt({
+                        denoise: denoiseFloat,
+                        cfg: cfg,
+                        inputImage: filename
+                    });
+
+                    // 3. Wait
+                    const finalUrl = await comfyClient.getResult(queueRes.prompt_id);
+
+                    return {
+                        success: true,
+                        imageUrl: finalUrl
+                    };
+
+                } catch (e) {
+                    console.error("Pro Mode Error:", e);
+                    showNotification('AI Engine Error: ' + e.message, 'error');
+                    return { success: false, error: e.message };
+                }
+            }
+
+            // REAL CLIENT-SIDE PROCESSING (Fallback)
+            // No backend required. Works immediately.
+            try {
+                console.log("Applying local skin texture engine...");
+                const textureResult = await applyTextureToImage(imageData, denoise);
+
+                return {
+                    success: true,
+                    imageUrl: textureResult
+                };
+            } catch (e) {
+                console.error("Processing failed", e);
+                return { success: false, error: "Local processing failed" };
+            }
+        }
+
+        function activeComparisonView(beforeSrc, afterSrc) {
+            sideBySideContainer.style.display = 'none';
+            comparisonContainer.style.display = 'block';
+
+            compBefore.src = beforeSrc;
+            compAfter.src = afterSrc;
+
+            // Reset slider to center
+            compBefore.style.width = '50%';
+            sliderHandle.style.left = '50%';
+        }
+
+        function downloadImage() {
+            if (!enhancedImageUrl) {
+                showNotification('No enhanced image to download', 'error');
+                return;
+            }
+            const link = document.createElement('a');
+            link.href = enhancedImageUrl;
+            link.download = `naturaskin-result-${Date.now()}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showNotification('Image downloaded! 📥', 'success');
+        }
+
+        function resetApp() {
+            currentImage = null;
+            enhancedImageUrl = null;
+            uploadContent.classList.remove('hidden');
+            previewArea.classList.add('hidden');
+            fileInput.value = '';
+            isDemoMode = false;
+
+            // Reset sliders
+            denoiseSlider.value = 35;
+            if (denoiseValue) denoiseValue.textContent = '35%';
+
+            downloadBtn.disabled = true;
+            comparisonContainer.style.display = 'none';
+            if (compareBtn) compareBtn.classList.add('hidden'); // Hide compare button
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.textContent = message;
+
+            Object.assign(notification.style, {
+                position: 'fixed',
+                top: '20px',
+                right: '20px',
+                padding: '1rem 1.5rem',
+                background: type === 'success' ? '#10b981' : (type === 'error' ? '#ef4444' : '#2dd4bf'),
+                color: 'white',
+                borderRadius: '8px',
+                zIndex: '1000',
+                animation: 'slideIn 0.3s ease',
+                fontWeight: 'bold',
+                boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
             });
 
-            // 3. Wait
-            const finalUrl = await comfyClient.getResult(queueRes.prompt_id);
-
-            return {
-                success: true,
-                imageUrl: finalUrl
-            };
-
-        } catch (e) {
-            console.error("Pro Mode Error:", e);
-            showNotification('AI Engine Error: ' + e.message, 'error');
-            return { success: false, error: e.message };
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
         }
-    }
 
-    // REAL CLIENT-SIDE PROCESSING (Fallback)
-    // No backend required. Works immediately.
-    try {
-        console.log("Applying local skin texture engine...");
-        const textureResult = await applyTextureToImage(imageData, denoise);
-
-        return {
-            success: true,
-            imageUrl: textureResult
-        };
-    } catch (e) {
-        console.error("Processing failed", e);
-        return { success: false, error: "Local processing failed" };
-    }
-}
-
-function activeComparisonView(beforeSrc, afterSrc) {
-    sideBySideContainer.style.display = 'none';
-    comparisonContainer.style.display = 'block';
-
-    compBefore.src = beforeSrc;
-    compAfter.src = afterSrc;
-
-    // Reset slider to center
-    compBefore.style.width = '50%';
-    sliderHandle.style.left = '50%';
-}
-
-function downloadImage() {
-    if (!enhancedImageUrl) {
-        showNotification('No enhanced image to download', 'error');
-        return;
-    }
-    const link = document.createElement('a');
-    link.href = enhancedImageUrl;
-    link.download = `naturaskin-result-${Date.now()}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    showNotification('Image downloaded! 📥', 'success');
-}
-
-function resetApp() {
-    currentImage = null;
-    enhancedImageUrl = null;
-    uploadContent.classList.remove('hidden');
-    previewArea.classList.add('hidden');
-    fileInput.value = '';
-    isDemoMode = false;
-
-    // Reset sliders
-    denoiseSlider.value = 35;
-    if (denoiseValue) denoiseValue.textContent = '35%';
-
-    downloadBtn.disabled = true;
-    comparisonContainer.style.display = 'none';
-    if (compareBtn) compareBtn.classList.add('hidden'); // Hide compare button
-}
-
-function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.textContent = message;
-
-    Object.assign(notification.style, {
-        position: 'fixed',
-        top: '20px',
-        right: '20px',
-        padding: '1rem 1.5rem',
-        background: type === 'success' ? '#10b981' : (type === 'error' ? '#ef4444' : '#2dd4bf'),
-        color: 'white',
-        borderRadius: '8px',
-        zIndex: '1000',
-        animation: 'slideIn 0.3s ease',
-        fontWeight: 'bold',
-        boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-    });
-
-    document.body.appendChild(notification);
-    setTimeout(() => {
-        notification.style.opacity = '0';
-        setTimeout(() => notification.remove(), 300);
-    }, 3000);
-}
-
-// Add styles programmatically
-const style = document.createElement('style');
-style.textContent = `
+        // Add styles programmatically
+        const style = document.createElement('style');
+        style.textContent = `
     @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
 `;
-document.head.appendChild(style);
+        document.head.appendChild(style);
 
-// ===== INITIALIZE =====
-console.log('🌿 NaturaSkin AI Web App Initialized');
-console.log('Deep Check Pipeline: Ready to analyze texture quality.');
+        // ===== INITIALIZE =====
+        console.log('🌿 NaturaSkin AI Web App Initialized');
+        console.log('Deep Check Pipeline: Ready to analyze texture quality.');
+
+    }); // End DOMContentLoaded
+
