@@ -3,7 +3,8 @@
 <div align="center">
   <img src="assets/logo.png" alt="NaturaSkin AI Logo" width="120" />
   <h1>NaturaSkin AI</h1>
-  <p><strong>Authentic Skin Restoration for the AI Age</strong></p>
+  <p><strong>Professional Skin Texture Restoration for the AI Age</strong></p>
+  <p>Fix "plastic" AI skin with one click.</p>
 
   [![Sponsor](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/black12-ag)
   [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -13,104 +14,85 @@
 
 ---
 
-**NaturaSkin AI** is a professional-grade web tool designed to fix the "plastic/glossy" look of AI-generated portraits. By injecting realistic micropores, texture, and natural imperfections using a specialized Flux-based pipeline, it transforms artificial faces into authentic, human-like images.
+## 🧐 What is NaturaSkin AI?
 
-## 🧠 System Architecture
+AI image generators (like Midjourney or Stable Diffusion) often create faces that look **too perfect**—smooth, plastic, and unnatural. 
 
-### 1. High-Level Data Flow
+**NaturaSkin AI** is a professional web application that fixes this problem. It uses a specialized AI pipeline to:
+1.  **Analyze** the image to find skin areas.
+2.  **Inject** realistic micro-texture (pores, fine grain, skin irregularities).
+3.  **Enhance** the realism without changing the person's identity.
 
-```mermaid
-graph LR
-    User([User]) -->|1. Upload Portrait| Web["Web Client <br/> (Vite/JS)"]
-    Web -->|2. Pre-process| API{"API Gateway <br/> Cloudflare Functions"}
-    API -->|3. Inference Req| Flux["Flux.1 AI Model <br/> (ComfyUI Backend)"]
-    Flux -->|4. Texture Map| Refine[Enhancement Node]
-    Refine -->|5. Image Result| API
-    API -->|6. JSON Response| Web
-    Web -->|7. Display/Download| User
+It is the perfect tool for digital artists, photographers, and AI creators who want their portraits to look **real**.
 
-    style Web fill:#2dd4bf,stroke:#0f766e,color:black
-    style Flux fill:#f43f5e,stroke:#9f1239,color:white
-```
+---
 
-### 2. Detailed Technical Workflow
+## ✨ Features
 
-```mermaid
-sequenceDiagram
-    participant C as Client (Browser)
-    participant S as Server (Worker)
-    participant AI as AI Engine (Flux)
-    
-    C->>C: Validate Image (Size/Type)
-    C->>C: Generate Preview Blob
-    C->>S: POST /api/enhance {image, denoise: 0.35}
-    
-    Note over S, AI: Secure Handshake
-    
-    S->>AI: Queue Prompt (Skin_Fix_Workflow_v1)
-    AI->>AI: Load Checkpoint (enhancor.safetensors)
-    AI->>AI: Segment Face (Mask)
-    AI->>AI: Apply Localized Noise Injection
-    AI->>AI: KSampler (20 Steps, 0.35 Denoise)
-    AI->>AI: VAE Decode
-    
-    AI-->>S: Return Base64 Image
-    S-->>C: Response {success: true, url: "..."}
-    
-    C->>C: Update UI State
-    C->>C: Enable Download Button
-```
+### 1. ⚡ Instant Demo Mode (Offline)
+*   **Zero Setup**: Works immediately in your browser.
+*   **Simulation**: Uses a client-side texture engine to demonstrate the effect instantly.
+*   **Privacy First**: Your photos never leave your device in this mode.
 
-### 3. Local AI Bridge (Pro Mode)
+### 2. 🧠 Pro AI Engine (Real Power)
+*   **Deep Processing**: Connects to a powerful ComfyUI backend running the **Enhancor Skin Fix** model.
+*   **Flux Model**: Uses state-of-the-art Flux.1 AI technology for cinema-quality results.
+*   **Custom Control**: Adjust "Texture Intensity" (Denoise) to control how much texture is added.
 
-This app can connect directly to your local ComfyUI instance for maximum power and privacy.
+### 3. ⚖️ Comparison Slider
+*   **Before & After**: Drag the slider to see the exact difference between the plastic original and the natural result.
+*   **Side-by-Side**: Easily compare details.
 
-**Requirements:**
-1.  **ComfyUI** installed and running.
-2.  **Enhancor Workflow** loaded.
-3.  **CORS Enabled**: Run ComfyUI with:
-    ```bash
-    python main.py --enable-cors-header "*"
-    ```
+---
 
-**Workflow Setup:**
-1.  Open ComfyUI.
-2.  Load `skin_fix_workflow.json` (drag & drop).
-3.  **Important**: Save the workflow as **API Format** (Enable Dev Mode Options in ComfyUI Settings -> Save (API Format)).
-4.  Rename it to `workflow_template.json` and replace the file in `public/workflow_template.json`.
+## 🚀 How to Use
 
-### 4. Free Cloud Mode (Google Colab) ☁️
+### Step 1: Open the App
+Go to [https://naturaskin-ai.pages.dev](https://naturaskin-ai.pages.dev).
 
-If your computer is slow (e.g., Mac with 8GB RAM), you can run the AI engine on Google's free GPUs!
+### Step 2: Upload Image
+Drag and drop your AI-generated portrait into the upload box.
 
-1.  **Open the Config Guide**: Read `FULL_COLAB_GUIDE.md`.
-2.  **Click & Run**: Use our One-Click Colab link to start the backend.
-3.  **Connect**: Copy the `trycloudflare.com` URL provided by the notebook.
-4.  **Paste in App**: Toggle "AI Engine" and paste the URL into the "Server Address" box.
+### Step 3: Choose Your Engine
+*   **For Quick Test**: Keep "AI Engine" **OFF** (Demo Mode). Click **Enhance**.
+*   **For Real Results**: Turn "AI Engine" **ON**. (See Setup below).
 
-## 🚀 Live Demo
+### Step 4: Download
+Use the slider to compare. If you like the result, click **Download** to save the high-quality comparison or final image.
 
-[Launch App on Cloudflare Pages](https://naturaskin-ai.pages.dev) 
+---
+
+## ☁️ How to Connect the Pro AI Engine (Free)
+
+Since the AI model requires a powerful GPU, we provide a way to run it **for free** using Google Colab.
+
+1.  **Start the Server**:
+    *   [Click Here to Open our Google Colab Notebook](https://colab.research.google.com/github/black12-ag/NaturaSkin-AI/blob/master/FREE_COMFYUI_COLAB.ipynb).
+    *   Click the **Play Button** (▶️) to start the machine.
+    *   Wait ~5 minutes for it to install.
+
+2.  **Get the Link**:
+    *   The script will generate a public link ending in `.trycloudflare.com`.
+    *   **IMPORTANT**: Copy this link and open it in a **new tab** first to verify the connection (bypass the "Visit Site" warning).
+
+3.  **Connect**:
+    *   Go back to [NaturaSkin AI](https://naturaskin-ai.pages.dev).
+    *   Toggle **AI Engine** to **ON**.
+    *   Paste the link into the **Server Address** box.
+    *   Wait for the green **LINKED** badge.
+
+*(Note: This connection lasts as long as your Colab tab is open. For 24/7 access, see `MANUAL.md` for paid hosting options.)*
+
+---
 
 ## 🛠️ Technology Stack
 
-- **Frontend**: Vite + Vanilla JS (Pure Performance)
-- **Styling**: Custom CSS (Teal/Natural Theme)
-- **AI Core**: ComfyUI Workflow (Flux Model based)
-- **Hosting**: Cloudflare Pages (Static + Functions)
+*   **Frontend**: Vite, Vanilla JavaScript (Fast & Lightweight).
+*   **Backend**: ComfyUI (Python/PyTorch).
+*   **Model**: Flux.1 + Enhancor Skin Fix LoRA.
+*   **Networking**: Cloudflare Tunnels + WebSockets.
 
-## 📦 Quick Start
-
-```bash
-# Clone the repository
-git clone https://github.com/black12-ag/NaturaSkin-AI.git
-
-# Install dependencies
-npm install
-
-# Run local server
-npm run dev
-```
+---
 
 ## 🔒 Copyright & License
 
