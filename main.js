@@ -1,5 +1,6 @@
 // ===== IMPORTS =====
 import { translations } from './translations.js';
+import { ComfyClient } from './comfyClient.js';
 
 // ===== STATE MANAGEMENT =====
 let currentImage = null;
@@ -142,6 +143,55 @@ uploadArea.addEventListener('drop', (e) => {
 // Slider updates
 denoiseSlider.addEventListener('input', (e) => {
     denoiseValue.textContent = e.target.value + '%';
+});
+
+// AI Engine Toggle
+const aiEngineToggle = document.getElementById('aiEngineToggle');
+const engineBadge = document.getElementById('engineBadge');
+const connectionStatus = document.getElementById('connectionStatus');
+const serverConfig = document.getElementById('serverConfig');
+const serverUrlInput = document.getElementById('serverUrl');
+
+const comfyClient = new ComfyClient();
+let isProMode = false;
+
+aiEngineToggle.addEventListener('change', async (e) => {
+    if (e.target.checked) {
+        serverConfig.style.display = 'block';
+        const address = serverUrlInput.value.trim();
+        comfyClient.updateAddress(address);
+
+        connectionStatus.textContent = `Connecting to ${address}...`;
+        const connected = await comfyClient.connect();
+
+        if (connected) {
+            isProMode = true;
+            engineBadge.textContent = 'LINKED';
+            engineBadge.className = 'badge badge-pro';
+            connectionStatus.textContent = `🟢 Connected to ${address}`;
+            showNotification('Connected to Local AI Engine! 🚀', 'success');
+        } else {
+            engineBadge.textContent = 'ERROR';
+            engineBadge.className = 'badge badge-demo';
+            connectionStatus.textContent = '❌ Connection failed. Check Console/CORS.';
+            showNotification('Could not connect. Ensure ComfyUI > main.py --enable-cors-header "*"', 'error');
+            // e.target.checked = false; // Let them keep trying
+        }
+    } else {
+        isProMode = false;
+        engineBadge.textContent = 'OFFLINE';
+        engineBadge.className = 'badge badge-demo';
+        connectionStatus.textContent = 'Using client-side simulation.';
+    }
+});
+
+// Update connection when URL changes if toggle is on
+serverUrlInput.addEventListener('change', async () => {
+    if (aiEngineToggle.checked) {
+        // Trigger reconnect logic
+        const event = new Event('change');
+        aiEngineToggle.dispatchEvent(event);
+    }
 });
 
 // Button actions
@@ -368,7 +418,55 @@ async function processImageWithAI(imageData, denoise) {
         };
     }
 
-    // REAL CLIENT-SIDE PROCESSING
+    // PRO MODE (Local ComfyUI)
+    if (isProMode) {
+        try {
+            console.log("Using Local AI Engine...");
+            enhancedPlaceholder.innerHTML = `
+                <div class="spinner"></div>
+                <p>Uploading to AI Engine...</p>
+            `;
+
+            // 1. Upload
+            // Need to convert DataURL to File/Blob
+            const res = await fetch(imageData);
+            const blob = await res.blob();
+            const file = new File([blob], "input.png", { type: "image/png" });
+            const uploadRes = await comfyClient.uploadImage(file);
+            const filename = uploadRes.name; // Usually input.png or timestamped
+
+            // 2. Queue
+            enhancedPlaceholder.innerHTML = `
+                <div class="spinner"></div>
+                <p>Generating skin texture...</p>
+            `;
+
+            // Map 20-50 slider to 0.20-0.50
+            const denoiseFloat = denoise / 100;
+            const cfg = 1.0; // Default or add slider
+
+            const queueRes = await comfyClient.queuePrompt({
+                denoise: denoiseFloat,
+                cfg: cfg,
+                inputImage: filename
+            });
+
+            // 3. Wait
+            const finalUrl = await comfyClient.getResult(queueRes.prompt_id);
+
+            return {
+                success: true,
+                imageUrl: finalUrl
+            };
+
+        } catch (e) {
+            console.error("Pro Mode Error:", e);
+            showNotification('AI Engine Error: ' + e.message, 'error');
+            return { success: false, error: e.message };
+        }
+    }
+
+    // REAL CLIENT-SIDE PROCESSING (Fallback)
     // No backend required. Works immediately.
     try {
         console.log("Applying local skin texture engine...");

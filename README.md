@@ -61,6 +61,33 @@ sequenceDiagram
     C->>C: Enable Download Button
 ```
 
+### 3. Local AI Bridge (Pro Mode)
+
+This app can connect directly to your local ComfyUI instance for maximum power and privacy.
+
+**Requirements:**
+1.  **ComfyUI** installed and running.
+2.  **Enhancor Workflow** loaded.
+3.  **CORS Enabled**: Run ComfyUI with:
+    ```bash
+    python main.py --enable-cors-header "*"
+    ```
+
+**Workflow Setup:**
+1.  Open ComfyUI.
+2.  Load `skin_fix_workflow.json` (drag & drop).
+3.  **Important**: Save the workflow as **API Format** (Enable Dev Mode Options in ComfyUI Settings -> Save (API Format)).
+4.  Rename it to `workflow_template.json` and replace the file in `public/workflow_template.json`.
+
+### 4. Free Cloud Mode (Google Colab) ☁️
+
+If your computer is slow (e.g., Mac with 8GB RAM), you can run the AI engine on Google's free GPUs!
+
+1.  **Open the Config Guide**: Read `FULL_COLAB_GUIDE.md`.
+2.  **Click & Run**: Use our One-Click Colab link to start the backend.
+3.  **Connect**: Copy the `trycloudflare.com` URL provided by the notebook.
+4.  **Paste in App**: Toggle "AI Engine" and paste the URL into the "Server Address" box.
+
 ## 🚀 Live Demo
 
 [Launch App on Cloudflare Pages](https://naturaskin-ai.pages.dev) 

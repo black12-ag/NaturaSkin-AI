@@ -127,6 +127,35 @@
                             <input type="range" id="denoiseSlider" min="20" max="50" value="35">
                         </div>
 
+                        <!-- AI Engine Toggle -->
+                        <div class="control-group"
+                            style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border);">
+                            <div class="control-group">
+                                <div class="control-label">
+                                    <span>AI Engine</span>
+                                    <span class="badge badge-demo" id="engineBadge">OFFLINE</span>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="aiEngineToggle">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+
+                            <!-- Server Address Input (Hidden by default or shown when connecting) -->
+                            <div class="control-group" id="serverConfig" style="display:none; margin-top: 10px;">
+                                <label for="serverUrl"
+                                    style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 5px;">Server
+                                    Address</label>
+                                <input type="text" id="serverUrl" value="127.0.0.1:8188"
+                                    placeholder="e.g. 127.0.0.1:8188 or https://..."
+                                    style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary);">
+                            </div>
+
+                            <div class="status-message" id="connectionStatus">
+                                Using client-side simulation.
+                            </div>
+                        </div>
+
                         <div class="action-buttons">
                             <button class="btn btn-secondary hidden" id="compareBtn" style="cursor: grab;">👁️ Hold to
                                 Compare</button>
